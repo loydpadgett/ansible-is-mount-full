@@ -7,7 +7,7 @@
   tasks:
     - name: parse through mount variable
       debug: 
-        msg: "Drive is mounted at {{ item.mount }} {% if item.block_used/item.block_total * 100 > 80 %} drive is {{ item.block_used/item.block_total * 100 }}% full.{% else %} drive is healthy.{% endif %}"
+        msg: "Drive is mounted at {{ item.mount }} {% if item.block_used/item.block_total * 100 > 80 -%} ----- drive is {{ item.block_used/item.block_total * 100 }}% full{% endif %}"
       loop: "{{ ansible_mounts }}"
       loop_control:
         label: "{{  item.mount }}"
