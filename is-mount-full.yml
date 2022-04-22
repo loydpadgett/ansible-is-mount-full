@@ -1,6 +1,6 @@
 ---
 - name: Print reports about drive mounts
-  hosts: rhel6,rhel7,rhel8
+  hosts: "{{ target }}"
   gather_facts: true
   vars:
     mount_total: 
