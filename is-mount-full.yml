@@ -9,7 +9,8 @@
       debug: 
         msg: |
             "Drive is mounted at {{ item.mount }} {% if item.block_used/item.block_total * 100 > 80 -%} 
-            ----- drive is {{ item.block_used/item.block_total * 100 }}% full. {% elif item.block_used/item.block_total * 100 < 80 -%} ----- drive is HEALTHY: {{ item.block_used/item.block_total * 100 }}%{%endif %}"
+            ----- drive is UNHEALTHY!!: {{ item.block_used/item.block_total * 100 }}% full. {% elif item.block_used/item.block_total * 100 < 80 -%} 
+            ----- drive is HEALTHY: {{ item.block_used/item.block_total * 100 }}%{%endif %}"
       loop: "{{ ansible_mounts }}"
       loop_control:
         label: "{{  item.mount }}"
