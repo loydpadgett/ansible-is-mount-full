@@ -2,8 +2,8 @@
 - name: Print reports about drive mounts
   hosts: "{{ target }}"
   gather_facts: true
-  vars:
-    mount_total: 
+  vars_files:
+    - vars/report_vars.yml
   tasks:
     - name: parse through mount variable
       debug: 
@@ -20,7 +20,19 @@
       register: disk_var
 
       copy: 
-        content: disk_var.results
-        dest: /etc/disk-info.txt
+        content: "{{ item.content }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+        setype: "{{ item.setype }}"
+      loop: "{{ copy_results }"
+      register: copy_handoff
+      notify: display new file
 
-        
+  handlers:
+    - name: display contents of new file
+      debug:
+        msg: |
+          "{{ lookup('pipe','cat') + item.dest | quote }}"
+      loop: "{{ copy_results }}"
