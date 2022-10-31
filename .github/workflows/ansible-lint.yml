@@ -1,0 +1,12 @@
+name: Univerity of the Arts - Ansible Lint
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps: 
+      - uses: ansible/ansible-lint-action@v6.8.2
+      
+      - name: Run ansible-linter
+        uses: ansible-community/ansible-lint-action@main
