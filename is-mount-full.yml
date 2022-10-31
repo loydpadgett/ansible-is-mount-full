@@ -27,12 +27,12 @@
         group: "{{ item.group }}"
         mode: "{{ item.mode }}"
         setype: "{{ item.setype }}"
-      loop: "{{ copy_results }"
+      loop: "{{ copy_results }}"
       register: copy_handoff
       notify: display new file
 
   handlers:
-    - name: display contents of new file
+    - name: display new file
       debug:
         msg: |
           "{{ lookup('pipe','cat') + item.dest | quote }}"
