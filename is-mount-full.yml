@@ -19,6 +19,7 @@
         label: "{{  item.mount }}"
       register: disk_var
 
+    - name: copy results to a hw info report
       copy: 
         content: "{{ item.content }}"
         dest: "{{ item.dest }}"
