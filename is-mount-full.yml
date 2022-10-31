@@ -6,7 +6,7 @@
     - vars/report_vars.yml
   tasks:
     - name: parse through mount variable
-      debug: 
+      ansible.builtin.debug: 
         msg: |
             "Drive is mounted at {{ item.mount }} 
             {% if item.block_used/item.block_total * 100 > 80 -%} 
@@ -20,20 +20,20 @@
       register: disk_var
 
     - name: copy results to a hw info report
-      copy: 
-        content: "{{ item.content }}"
+      ansible.builtin.template: 
+        src: templates/disk-report.txt.j2
         dest: "{{ item.dest }}"
+        force: True
         owner: "{{ item.owner }}"
         group: "{{ item.group }}"
         mode: "{{ item.mode }}"
-        setype: "{{ item.setype }}"
       loop: "{{ copy_results }}"
       register: copy_handoff
       notify: display new file
 
   handlers:
     - name: display new file
-      debug:
+      ansible.builtin.debug:
         msg: |
           "{{ lookup('pipe','cat') + item.dest | quote }}"
       loop: "{{ copy_results }}"
