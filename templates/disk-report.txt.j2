@@ -1,4 +1,4 @@
 #######
 ### This is a disk info report to keep you from running unneccessary commands. 
 {{ disk_var.msg }}
-{{ disk_var['results'] | from_yaml | mandatory }}
+{{ disk_var['results'] | from_yaml | mandatory | list }}
