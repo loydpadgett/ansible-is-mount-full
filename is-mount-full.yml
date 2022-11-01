@@ -1,13 +1,50 @@
 ---
 - name: Print reports about drive mounts
-  hosts: rhel6,rhel7,rhel8
+  hosts: "{{ target }}"
   gather_facts: true
-  vars:
-    mount_total: 
+  vars_files:
+    - vars/report_vars.yml
   tasks:
-    - name: parse through mount variable
-      debug: 
-        msg: "Drive is mounted at {{ item.mount }} {% if item.block_used/item.block_total * 100 > 80 %} drive is {{ item.block_used/item.block_total * 100 }}% full.{% else %} drive is healthy.{% endif %}"
-      loop: "{{ ansible_mounts }}"
-      loop_control:
-        label: "{{  item.mount }}"
+    - name: test the tasks and error out if failure
+      block:
+        - name: parse through mount variable
+          ansible.builtin.debug: 
+            msg: |
+                "Drive is mounted at {{ item.mount }} 
+                {% if item.block_used/item.block_total * 100 > 80 -%} 
+                ----- drive is UNHEALTHY!!: {{ item.block_used/item.block_total * 100 }}% full. 
+                {% elif item.block_used/item.block_total * 100 < 80 -%} 
+                ----- drive is HEALTHY: {{ item.block_used/item.block_total * 100 }}%
+                {%endif %}"
+          loop: "{{ ansible_mounts }}"
+          loop_control:
+            label: "{{  item.mount }}"
+          register: disk_var
+          tags:
+            - diskinfo
+    
+        - name: copy results to file
+          ansible.builtin.template: 
+            src: templates/disk-report.txt.j2
+            dest: "{{ item.dest }}"
+            force: True
+            owner: "{{ item.owner }}"
+            group: "{{ item.group }}"
+            mode: "{{ item.mode }}"
+          loop: "{% if disk_var is defined %}{{ copy_results }}{% endif %}"
+          register: copy_handoff
+          notify: display new file
+          tags: 
+            - report
+      rescue:
+        - name: Let's try to explain what went wrong.
+          ansible.builtin.debug:
+            msg: "It's possible the {{ disk_var }} or {{ copy_handoff }} values are empty."
+  handlers:
+    - name: display new file
+      ansible.builtin.debug:
+        msg: |
+          "{{ lookup('pipe','cat') + item.dest | quote }}"
+      loop: "{{ copy_results }}"
+      tags:
+        - diskinfofile
