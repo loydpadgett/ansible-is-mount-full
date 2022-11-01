@@ -1,0 +1,6 @@
+---
+copy_results:
+  - dest: "/home/lpadgett/disk-info.txt"
+    owner: lpadgett
+    group: lpadgett
+    mode: '0440'
